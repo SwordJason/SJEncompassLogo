@@ -10,7 +10,7 @@
 
 @interface SJEncompassLogoAnimation()
 
-@property (nonatomic, strong) CALayer *animationLayer;
+@property (nonatomic, weak) CALayer *animationLayer;
 
 @end
 
@@ -30,7 +30,8 @@
         viewCenter = CGPointMake(actualSize, actualSize);
     }
     
-    CGPoint bigCenter = CGPointMake(0, 0);
+    CGFloat halfOrignalSize = actualSize * 0.5f;
+    CGPoint bigCenter = CGPointMake(0-halfOrignalSize, 0-halfOrignalSize);
     CGFloat bigRadius = MIN(viewCenter.x, viewCenter.y) * radiusBigPercent;
     CGFloat smallOffset = bigRadius*radiusOffsetPercent*sqrt(2);
     CGPoint smallCenter = CGPointMake(viewCenter.x + smallOffset, viewCenter.y-smallOffset);
@@ -65,7 +66,7 @@
     CAShapeLayer *encompassLayer = [CAShapeLayer layer];
     encompassLayer.path = encompassPath.CGPath;
     encompassLayer.fillColor = [UIColor redColor].CGColor;
-    encompassLayer.position = CGPointMake(bigRadius*2-smallRadius, smallRadius);
+    encompassLayer.position = CGPointMake(bigRadius*2-smallRadius-halfOrignalSize, smallRadius-halfOrignalSize);
     encompassLayer.transform = CATransform3DMakeRotation(M_PI*0.25, 0, 0, 1);
     [layer addSublayer:encompassLayer];
     self.animationLayer = encompassLayer;
@@ -85,13 +86,18 @@
 
 - (void)startAnimation
 {
+    NSTimeInterval beginTime = CACurrentMediaTime();
+
     CABasicAnimation *rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    rotationAnimation.removedOnCompletion = NO;
+    rotationAnimation.repeatCount = HUGE_VALF;
+    rotationAnimation.duration = 1.0f;
+    rotationAnimation.beginTime = beginTime - (rotationAnimation.duration * M_PI/4);
+    
     rotationAnimation.fromValue = [NSNumber numberWithFloat:M_PI*0.25];
     rotationAnimation.toValue = [NSNumber numberWithFloat:M_PI*2.25];
-    rotationAnimation.duration = 1;
-    rotationAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-    rotationAnimation.repeatCount = HUGE_VALF;
-    [self.animationLayer addAnimation:rotationAnimation forKey:@"Rotate"];
+    rotationAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    [self.animationLayer addAnimation:rotationAnimation forKey:@"animation"];
 }
 
 - (void)stopAnimation

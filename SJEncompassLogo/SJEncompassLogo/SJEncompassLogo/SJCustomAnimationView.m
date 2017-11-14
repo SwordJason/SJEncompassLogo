@@ -15,6 +15,7 @@
     if (self = [super init]) {
         _animator = animator;
         
+        self.layer.sublayers = nil;
         self.userInteractionEnabled = NO;
         self.hidden = YES;
     }
@@ -24,7 +25,7 @@
 - (void)setupAnimation
 {
     [self stopAnimating];
-    [self.animator setupAnimationInLayer:self.layer withSize:CGSizeMake(50, 50)];
+    [self.animator setupAnimationInLayer:self.layer withSize:CGSizeMake(35, 35)];
 }
 
 - (void)startAnimating
@@ -33,18 +34,23 @@
         [self setupAnimation];
     }
     
+    self.layer.speed = 1.0f;
     self.hidden = NO;
     _isAnimating = YES;
     [self.animator startAnimation];
 }
 
 - (void)stopAnimating {
-    _isAnimating = NO;
-    self.hidden = YES;
-    [self.layer removeAllAnimations];
-    self.layer.sublayers = nil;
-    
-    [self.animator stopAnimation];
+    if(_isAnimating)
+    {
+        _isAnimating = NO;
+        
+        if (self.animator) {
+            [self.animator stopAnimation];
+        }
+        
+        self.hidden = YES;
+    }
 }
 
 - (void)setProgress:(CGFloat)progress
