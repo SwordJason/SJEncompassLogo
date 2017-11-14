@@ -25,7 +25,7 @@
 - (void)setupAnimation
 {
     [self stopAnimating];
-    [self.animator setupAnimationInLayer:self.layer withSize:CGSizeMake(35, 35)];
+    [self.animator setupAnimationInLayer:self.layer withSize:CGSizeMake(50, 50)];
 }
 
 - (void)startAnimating
